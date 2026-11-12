@@ -1,5 +1,11 @@
 # Rev C plan — USB-only power, true 4-wire C/R, corrected J8 bias header
 
+> **Review:** see [`rev-c-scope-review.md`](rev-c-scope-review.md) before
+> building. It keeps the G6S-2 **DC5** relays on VBUS, drops the C-mode 4TP
+> block (U8/R38/R39/C20/C19), protects `SL`, isolates the V_N branch in C mode
+> with a spare AQY212, uses `V_FL` (PA7) instead of nominal VREF, and adds the
+> OLED/button the integration plan requires.
+
 **Status:** design plan, not yet implemented. Supersedes the Rev B power/relay
 arrangement and the earlier J8 pin proposal.
 **Scope:** ESWCap combined C+R carrier for the WeAct STM32G474 “Long” module.
