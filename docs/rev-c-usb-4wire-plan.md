@@ -1,18 +1,37 @@
 # Rev C plan — USB-only power, true 4-wire C/R, corrected J8 bias header
 
-**Status:** design plan, not yet implemented.
+**Status:** schematic implemented 2026-11-12; PCB intentionally not started.
+The sections below are the original plan. Where they say “U8 / second LMC6482”
+or “BIAS_MON = PA0”, the **implementation update** immediately below is the
+authoritative version.
 
-> **Pin conflict (2026-11-12): PA0 is no longer free.** PA0 is now the C-mode
-> `DRIVE` / COMP1_OUT pin, because PA8 cannot output COMP1 (its AF8 is
-> COMP7_OUT; see `docs/pcb-design.md`, "DRIVE moves from PA8 to PA0"). Every
-> `BIAS_MON = PA0 / ADC1_IN1` below must move. Suggested replacement: **PA8 /
-> J1-15 / ADC5_IN1**, which the move frees (ST pin data lists `ADC5_IN1` on
-> PA8). Not yet applied to the tables in this plan. Supersedes the Rev B power/relay
-arrangement and the earlier J8 pin proposal.
-**Scope:** ESWCap combined C+R carrier for the WeAct STM32G474 “Long” module.
-**Decisions already confirmed:** second LMC6482 allowed; J8 is 1×8; J5 is a
-4-pin terminal block (5.08 mm baseline, mechanical change to 3.81 mm possible
-later without circuit changes).
+> **Implementation update 2026-11-12**
+>
+> - **No second LMC6482 is used.** The second LMC6482 is not available. U8 and
+>   C19 were removed. The C-mode `SH` divider is now buffered by the **internal
+>   STM32 OPAMP3** (the same OPAMP3 that buffers `V_N` in R-mode).
+> - **U9 / U10 AQY212 selector.** U9 isolates the `SH → R20 → VN_SENSE` branch
+>   when K1 is off (C-mode). U10 connects `SH_DIV` to `VN_SENSE` when K1 is off
+>   (C-mode). Both are AQY212 spares; U9 is driven from the K1 coil, U10 from
+>   **PC4 (`C_MODE_SW`, active low)**.
+> - **PA0 is now `DRIVE` / COMP1_OUT**, per the 2026-11-12 firmware fix. PA8 is
+>   freed and is now **`BIAS_MON` on J1-15 / ADC5_IN1**. `BIAS_SET` stays on
+>   PA4/TIM3_CH2; `BIAS_EN` stays on PA15; UART stays on PC10/PC11.
+> - **J5 order is `FH, SH, SL, FL`** (not `FH, SH, FL, SL`). `SL` goes through
+>   **R40 100 kΩ** to U1B pin 5; U1B pin 5 is the `SL_BUF` net.
+> - **R20 is 100 kΩ**, D2 is **BAV199**, and the `V_N` branch is isolated in
+>   C-mode by U9.
+> - **Divider compensation:** C20 = **100 pF across the 1 MΩ bottom leg**;
+>   C21 = **10 pF across the 10 MΩ top leg**. This gives matched time constants.
+> - **BOM:** 88 physical parts, 46 grouped lines, 3 PWR_FLAGs. U1 is the only
+>   LMC6482; U5–U7 + U9 + U10 are AQY212; R20/R40 are 100 kΩ; R41/R43 are
+>   330 Ω; D2 is BAV199.
+> - **KiCad files:** schematic, project, symbol/footprint libraries and BOM are
+>   in `hardware/kicad/` and `hardware/fab/`. The PCB is not part of this push.
+>
+> **Scope:** ESWCap combined C+R carrier for the WeAct STM32G474 “Long” module.
+> **Decisions:** no second LMC6482; J8 is 1×8; J5 is a 4-pin 5.08 mm terminal
+> block.
 
 ---
 
@@ -376,7 +395,13 @@ with a possible stock/price difference from the DC5.
 - **C-mode 4TP firmware is the largest task.** The hardware supports it, but
   synchronous sampling/phase math and calibration need bench time. The
   ratiometric fallback is not full 4TP.
-- **LMC6482 bandwidth** limits the 4-terminal C path to ≈100 kHz; document it.
+- **Internal OPAMP3 bias current and C7** limit the 4-terminal C path. OPAMP3
+  is a CMOS internal op-amp, not a 20 fA LMC6482; its input bias current and
+  offset must be calibrated. C7 1 nF at the 0.9 MΩ `SH_DIV` source gives a
+  ≈177 Hz pole, so the C-mode 4TP path is currently a low-frequency measurement.
+  For higher-frequency 4TP, add a dedicated low-bias buffer or reduce/switch C7.
+- **U9/U10 AQY212** on-resistance and off-leakage are in the `V_N`/`SH_DIV`
+  paths; measure them on the bench. U10 is controlled by PC4 (`C_MODE_SW`).
 - **Divider loading:** 11 M on `SH` is subtracted in C-mode; verify at the 1 M
   range and low frequency.
 - **G6S-2 DC3 stock** — check Digi-Key/Mouser/LCSC before layout.

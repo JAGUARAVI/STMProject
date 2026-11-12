@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+
+  (lib (name "eswcap") (type "KiCad") (uri "${KIPRJMOD}/eswcap.kicad_sym") (options "") (descr "")))
