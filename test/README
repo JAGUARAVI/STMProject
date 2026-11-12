@@ -1,0 +1,15 @@
+This directory is intended for PlatformIO unit tests.
+
+Unit tests are written with the Unity framework (configured in platformio.ini).
+
+To run the tests on the target hardware:
+
+    pio test -e weact_g474ceu6
+
+Test files are discovered by matching `test_*` — e.g. `test/test_measure/test_measure.c`.
+
+Tests requiring hardware (the DUT socket, front-end switches, ADC) must be
+guarded so they only run when the fixture is attached; pure maths — the fusion
+scoring, median gate, τ fit and calibration solvers — should run standalone.
+
+This directory is empty until the measurement code exists.

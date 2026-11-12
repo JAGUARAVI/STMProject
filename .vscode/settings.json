@@ -1,0 +1,76 @@
+{
+  // -------------------------------------------------------------------------
+  // Files
+  // -------------------------------------------------------------------------
+  "files.associations": {
+    "*.h": "c",
+    "*.c": "c",
+    "platformio.ini": "ini"
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.eol": "\n",
+
+  // Hide build output from search and the file explorer; it is regenerated.
+  "files.exclude": {
+    "**/.pio": true
+  },
+  "search.exclude": {
+    "**/.pio": true
+  },
+
+  // -------------------------------------------------------------------------
+  // C/C++
+  // -------------------------------------------------------------------------
+  // The PlatformIO IDE extension regenerates c_cpp_properties.json with the
+  // correct Cube HAL include paths and defines after the first build. These
+  // defaults keep the editor sane before that happens.
+  "C_Cpp.default.cStandard": "c11",
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.intelliSenseMode": "gcc-arm",
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/include",
+    "${workspaceFolder}/src"
+  ],
+  // Let PlatformIO own the IntelliSense database; don't fight it with a
+  // hard-coded config.
+  "C_Cpp.default.configurationProvider": "platformio.platformio-ide",
+
+  // -------------------------------------------------------------------------
+  // Editor
+  // -------------------------------------------------------------------------
+  "[c]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.rulers": [80]
+  },
+  "[ini]": {
+    "editor.tabSize": 4
+  },
+
+  // -------------------------------------------------------------------------
+  // Terminal
+  // -------------------------------------------------------------------------
+  // PlatformIO Core is installed at ~/.platformio/penv/bin and is NOT on the
+  // default PATH, so `pio` in an integrated terminal would not be found.
+  // Prepending it here makes the CLI work in every new terminal.
+  "terminal.integrated.env.linux": {
+    "PATH": "${env:HOME}/.platformio/penv/bin:${env:PATH}"
+  },
+
+  // -------------------------------------------------------------------------
+  // PlatformIO
+  // -------------------------------------------------------------------------
+  // Do not auto-organize includes on save: the Cube HAL relies on include
+  // order in a few places (hal_conf.h), and reordering can break the build.
+  "platformio-ide.autoRebuildAutocompleteIndex": true,
+  "platformio-ide.useBuiltinPIOCore": true,
+  "platformio-ide.disableToolbar": false,
+  "platformio-ide.activateProjectOnTextEditorChange": true,
+
+  // Serial monitor: 115200 8N1 for the console. Do not assert DTR/RTS, or the
+  // adapter can hold the target in reset on a bare SWD/USB-serial bridge.
+  "platformio-ide.monitorSpeed": 115200,
+  "platformio-ide.monitorRts": 0,
+  "platformio-ide.monitorDtr": 0
+}

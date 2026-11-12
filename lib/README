@@ -1,0 +1,21 @@
+This directory is intended for project-specific (private) libraries.
+
+PlatformIO will compile them to static libraries and link into the executable.
+
+The source code of each library should be placed in a separate directory,
+like so:
+
+|-- lib
+|  |
+|  |-- mylib
+|     |-- mylib.h
+|     |-- mylib.c
+|     |-- library.json    (optional, describes dependencies, build flags...)
+
+This allows PlatformIO to automatically discover and build every library.
+
+If you need to use a library from the PlatformIO Registry, declare it in the
+`lib_deps` option of platformio.ini instead of vendoring it here.
+
+This directory is empty until the measurement, calibration and protocol code
+is split out of src/main.c.

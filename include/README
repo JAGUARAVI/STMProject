@@ -1,0 +1,17 @@
+This directory is intended for project header files.
+
+A header file is a file containing C declarations and macro definitions
+to be shared between several project source files. You request the use of a
+header file in your project source file by including it, with the C
+preprocessing directive #include.
+
+For example, if you put a header file "myheader.h" in this directory, you can
+then have source files inside your local "src" directory that #include it:
+
+    #include "myheader.h"
+
+Headers that are private to the firmware belong here. Anything that is a
+reusable, self-contained library belongs in lib/ instead.
+
+Note: stm32_assert.h lives here because the STM32Cube HAL/LL drivers include it
+unconditionally when USE_FULL_ASSERT is defined.
