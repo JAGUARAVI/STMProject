@@ -186,6 +186,37 @@ static void test_osc_two_point_rejects_close_refs(void)
     ok();
 }
 
+/* The G474 oscillator's K is set by the COMP1 hysteresis (70 mV around a
+ * 1.65 V threshold, 0 .. 3.3 V drive). Check the nominal constant against the
+ * relaxation formula, and that the solvers accept K across the hysteresis
+ * tolerance -- the old 0.05 gate refused a real G474 calibration. */
+static void test_osc_accepts_g474_k(void)
+{
+    begin("osc solvers accept the G474 COMP1 K (70 mV hysteresis)");
+
+    const double vdd = 3300.0, vh = 1685.0, vl = 1615.0;
+    double k_formula = log((vdd - vl) / (vdd - vh)) + log(vh / vl);
+    CHECK_NEAR(k_formula, OSC_K_NOMINAL, OSC_K_NOMINAL * 0.02);
+
+    const double r = RES_1M_OHM;
+    const double t0_true = 0.4;
+    const double c_block = board_c_block_f();
+    const double ks[] = { OSC_K_NOMINAL, 0.5 * OSC_K_NOMINAL };
+
+    for (size_t i = 0; i < sizeof ks / sizeof ks[0]; ++i) {
+        const double c1 = 100e-12, c2 = 1000e-12;
+        double p1 = (ks[i] * r * cblock_forward(c1) * 1e6) + t0_true;
+        double p2 = (ks[i] * r * cblock_forward(c2) * 1e6) + t0_true;
+
+        double k = 0, t0 = 0;
+        CHECK(osc_solve_two_point(p1, c1, p2, c2, r, c_block, &k, &t0));
+        CHECK_NEAR(k, ks[i], ks[i] * 0.01);
+        CHECK_NEAR(osc_k_from_ref(p2, t0_true, r, c2, c_block), ks[i],
+                   ks[i] * 0.01);
+    }
+    ok();
+}
+
 static void test_osc_measure_roundtrip(void)
 {
     begin("osc measure inverts the model to the DUT value");
@@ -554,6 +585,7 @@ int main(void)
 
     test_osc_two_point();
     test_osc_two_point_rejects_close_refs();
+    test_osc_accepts_g474_k();
     test_osc_measure_roundtrip();
     test_osc_open_socket();
 

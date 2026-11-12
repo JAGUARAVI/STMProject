@@ -25,7 +25,7 @@ to an **STM32G474CEU6**, targeting the **WeAct Studio "Long" core board**.
 | HSE crystal | 8 MHz, on **PF0/PF1** (not PA) |
 | Regulator | ME6231A33M3G (5 V pin accepts ~3.5–18 V) |
 | User LED | **PC6**, active high (`PC6 -> 5.1k -> LED -> GND`) |
-| User button | **PC13**, active low to GND |
+| User button | **PC13**, active **high** (`PC13 -> 330R -> key -> 3.3 V`) |
 
 Board repo (schematics, datasheets, examples):
 <https://github.com/WeActStudio/WeActStudio.STM32G474CoreBoard>
@@ -60,7 +60,7 @@ DAC, so the comparator reference needs no external divider.
 
 | | `INP` | `INM` options | Internal DAC on `INM` | Output pins (AF8) |
 | --- | --- | --- | --- | --- |
-| COMP1 | PA1, PB1 | PA0, PA4 | **DAC1_CH1, DAC3_CH1** | PA0, PA6, PA8, PA11 |
+| COMP1 | PA1, PB1 | PA0, PA4 | **DAC1_CH1, DAC3_CH1** | PA0, PA6, PA11, PB8 |
 | COMP2 | PA3, PA7 | PA2, PA5 | **DAC1_CH2, DAC3_CH2** | PA2, PA7, PA9, PA12 |
 | COMP3 | PA0 | PF1 *(HSE!)* | DAC1_CH1, DAC3_CH1 | PB7, PB15 (AF3) |
 | COMP4 | PB0 | PB2 | **DAC1_CH1, DAC3_CH2** | PB1, PB6, PB14 |
@@ -132,8 +132,10 @@ CPU jitter.
   DAC costs those pins. **Use DAC3 instead** to avoid the conflict entirely.
 * **Comparator output must not land on its own input pin.** COMP1's output
   shares PA0 with its `INM`; COMP2's shares PA2 with its `INM`. Pick a different
-  output (COMP1 → PA6/PA8, COMP2 → PA7/PA9) — or better, route it internally to
-  the timer and use **no output pin at all**.
+  output (COMP2 → PA7/PA9) — or better, route it internally to the timer and use
+  **no output pin at all**. COMP1's output exists **only on PA0, PA6, PA11 and
+  PB8** (not PA8 — PA8's AF8 is COMP7_OUT). PA11 is USB and PB8 is BOOT0, so
+  in practice it is PA0 or PA6.
 * **OPAMP1 `VOUT` (PA2) overlaps COMP2's `INM`**, and OPAMP2 `VOUT` (PA6)
   overlaps COMP1's output. Mode-dependent, but allocate deliberately.
 * **`OPAMP_NONINVERTINGINPUT_DAC` and `..._IO3` are the same bit encoding**
@@ -164,7 +166,7 @@ Suggested mapping (avoiding the collisions above):
 | COMP1 `INP` | **PB1** | `V_cap` sense node (BAT54S clamped) |
 | COMP1 `INM` | internal | `DAC1_CH1` — replaces the 1.65 V divider |
 | `DAC1_OUT1` | PA4 | leave unrouted, or reserve |
-| COMP1 `OUT` | **PA6** or **PA8** | timer input-capture input |
+| COMP1 `OUT` | **PA0** or **PA6** | drive-buffer input; timer capture is internal |
 
 Why this is an upgrade, not just a part-count reduction:
 
@@ -354,8 +356,8 @@ What the hardware changed, relative to the ESP32:
 | ESP32 mechanism | G474 mechanism |
 | --- | --- |
 | Software ADC poll loop + adaptive decimation | TIM6-triggered ADC1 + circular DMA, hardware oversampling |
-| LM393 + 10k/10k divider + 100k hysteresis | COMP1 + DAC3 internal threshold (20 mV hysteresis) |
-| ISR mirrors comparator, PCNT measures it | **No CPU in the loop**: COMP1_OUT/PA8 drives the buffer; TIM2 captures via TISEL |
+| LM393 + 10k/10k divider + 100k hysteresis | COMP1 + DAC3 internal threshold (70 mV hysteresis, K ≈ 0.085) |
+| ISR mirrors comparator, PCNT measures it | **No CPU in the loop**: COMP1_OUT/PA0 drives the buffer; TIM2 captures via TISEL |
 | NVS blob store | reserved 2 KB flash page, append-only CRC records |
 | WS2812 over RMT | PC6 software PWM, same operational language |
 
@@ -424,7 +426,7 @@ The firmware is complete; what remains needs the physical board.
    170000000 Hz`, and a plausible `VDDA` reading. A blink-code loop at boot
    identifies which `require()` failed (1 = clocks … 8 = R-mode analog).
 3. **Verify the ADC stream.** A known DC level on `V_cap` should read correctly,
-   and the sample period should match the requested period (scope PA8 for the
+   and the sample period should match the requested period (scope PA0 for the
    comparator, or trigger on a GPIO toggle).
 4. **Verify the comparator.** Inject a square wave on the DUT node and confirm
    the console's `status`/`probe` see oscillation and that `zero` produces a

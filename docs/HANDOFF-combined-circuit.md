@@ -5,6 +5,8 @@
 > STM32G474CEU6 pin database. The topology and feedback-polarity conclusions
 > are correct; several pin-level instructions are not (PC5 is not bonded on
 > UFQFPN48, the LED is PC6 not PC13, and OPAMP1 PA7 is `IO2`, not `IO0`).
+> **PA8 cannot be COMP1_OUT** (its AF8 is COMP7_OUT); the drive/COMP1_OUT pin
+> is **PA0**. Read every `PA8` below as `PA0`.
 > See **`docs/handoff-verdict.md`** for the claim-by-claim verdict, the
 > evidence, and the corrected pin map. The firmware in `src/` implements the
 > corrected version.

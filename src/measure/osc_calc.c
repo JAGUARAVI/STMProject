@@ -31,8 +31,13 @@
  * capture, not real physics. The bounds are deliberately generous: the exact
  * constant depends on the comparator thresholds and the drive topology, and
  * rejecting a legitimate value is worse than accepting a marginal one that the
- * quality score will down-weight anyway. */
-#define OSC_K_MIN 0.05
+ * quality score will down-weight anyway.
+ *
+ * The lower bound must sit well below OSC_K_NOMINAL (~0.085 with 70 mV of
+ * COMP1 hysteresis): the hysteresis has a wide datasheet spread, so a real
+ * board can land at roughly half the nominal K. 0.05 was sized for the ESP32
+ * LM393 (K ~= 0.19) and would refuse a legitimate G474 calibration. */
+#define OSC_K_MIN 0.02
 #define OSC_K_MAX 50.0
 
 /**

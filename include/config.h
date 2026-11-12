@@ -18,9 +18,17 @@
  *     console is on the P1 header: PA9 = TX, PA10 = RX (USART1 AF7).
  *   - PC5 is NOT bonded on UFQFPN48. Do not put a signal there.
  *   - PB8 is BOOT0 on this board. Do not use it for a mux.
- *   - PA8 = COMP1_OUT (AF8); it is also the C-mode drive buffer input, so the
+ *   - PA0 = COMP1_OUT (AF8); it is also the C-mode drive buffer input, so the
  *     oscillator is closed in hardware. The pin is switched between AF and
  *     GPIO by bsp_comp.c.
+ *     **Not PA8:** on this package PA8's AF8 is COMP7_OUT, not COMP1_OUT.
+ *     ST's pin data (STM32_open_pin_data, GPIO-STM32G47x_gpio_v1_0) lists
+ *     COMP1_OUT only on PA0, PA6, PA11 and PB8 — PA6 is TIA_OUT, PA11 is
+ *     USB D-, PB8 is BOOT0, so PA0 is the only usable one. PA0 has nothing
+ *     else on the WeAct Long board (schematic V1.0: MCU pin 8 -> P2-6 only).
+ *   - PC13 (user key) is ACTIVE HIGH: PC13 -> 330 R -> key -> 3.3 V.
+ *   - VREF+ is tied to VDDA through R7 = 0 R on the module. Never enable
+ *     VREFBUF unless R7 is removed.
  *
  * Analogue topology (the one thing the handoff got right):
  *
@@ -89,7 +97,8 @@
  * RC-step mode it is a plain GPIO output. Note that C-mode drive current is
  * limited by the range resistor, so the buffer sees a logic-level input. */
 #define PIN_DRIVE_PORT      GPIOA
-#define PIN_DRIVE           GPIO_PIN_8      /* COMP1_OUT / SN74LVC1G34 input */
+#define PIN_DRIVE           GPIO_PIN_0      /* COMP1_OUT (AF8) / SN74LVC1G34 input, P2-6 */
+#define PIN_DRIVE_AF        GPIO_AF8_COMP1  /* valid on PA0; on PA8 AF8 is COMP7 */
 
 /* R-mode nodes. */
 #define PIN_B_PORT          GPIOA
@@ -192,11 +201,13 @@
 #define PIN_LED             GPIO_PIN_6
 #define LED_ACTIVE_LOW      0
 
-/* Optional user button (PC13, active low to GND). Not required by the
- * application; defined so a future factory-reset gesture has a pin. */
+/* Optional user button. On the WeAct Long board (schematic V1.0) the key is
+ * PC13 -> 330 R -> key -> 3.3 V, so it reads HIGH when pressed and needs the
+ * internal pull-down. Not required by the application; defined so a future
+ * factory-reset gesture has a pin. */
 #define PIN_BUTTON_PORT     GPIOC
 #define PIN_BUTTON          GPIO_PIN_13
-#define BUTTON_ACTIVE_LOW   1
+#define BUTTON_ACTIVE_LOW   0
 
 /* ------------------------------------------------------------------------- */
 /* Ranges                                                                    */
@@ -304,6 +315,19 @@
 #define OSC_MIN_F_HZ            10.0
 #define OSC_MAX_F_HZ            1000000.0
 #define OSC_TARGET_PERIODS      50
+
+/* COMP1 relaxation oscillator. The swing is set by the comparator hysteresis
+ * around the 1.65 V DAC3 threshold, driven 0 .. 3.3 V:
+ *
+ *     K = ln((Vdd - Vl)/(Vdd - Vh)) + ln(Vh/Vl)
+ *
+ * With 70 mV (the largest G4 setting) K ~= 0.085. The ESP32 LM393 board
+ * (10k/10k + 100k) had a 157 mV band and K ~= 0.19; the old 20 mV setting gave
+ * K ~= 0.024, below the solver's acceptance gate, so calibration was refused.
+ * OSC_K_NOMINAL is only the cold-start value; `cal1`/`cal2` measure the real
+ * one (the hysteresis has a wide datasheet tolerance). */
+#define OSC_COMP_HYSTERESIS     COMP_HYSTERESIS_70MV
+#define OSC_K_NOMINAL           0.085
 #define OSC_CAPTURE_MAX_EDGES   512
 
 /* Fusion */

@@ -154,6 +154,13 @@ PA0/PA4/PB2, at the cost of analog-header pins.)
 
 ### 3.9 PA8 is both COMP1_OUT and the C drive
 
+> **Correction (2026-11-12): PA8 cannot be COMP1_OUT on this package.** ST's
+> GPIO data (`GPIO-STM32G47x_gpio_v1_0`) gives PA8 AF8 = `COMP7_OUT`; COMP1_OUT
+> exists only on PA0, PA6, PA11 and PB8. Configuring PA8 as AF8 would output the
+> disabled COMP7 and the oscillator would never start. The drive / COMP1_OUT
+> pin is now **PA0** (WeAct P2-6, nothing else on the module). The AF/GPIO
+> switching described below is unchanged, just on PA0.
+
 The handoff says PA8 drives the buffer and is COMP1_OUT, but does not mention
 that the pin must be **reconfigured between AF (comparator) and GPIO output
 (RC step)**. In AF mode a GPIO write has no effect; in GPIO mode the comparator
@@ -233,7 +240,7 @@ the UFQFPN48 pin database and the WeAct Long schematic.
 | `V_B` buffer out | **PB12** | LMC6482 B output, ADC4_IN3 |
 | `TIA_OUT` | **PA6** | LMC6482 A output, ADC2_IN3 |
 | `VBIAS` (1.65 V) | **PA5** | ADC2_IN13 |
-| C drive / `COMP1_OUT` | **PA8** | AF8 COMP1 in oscillator mode; GPIO output in RC-step mode |
+| C drive / `COMP1_OUT` | **PA0** | AF8 COMP1 in oscillator mode; GPIO output in RC-step mode. **Not PA8** — PA8's AF8 is COMP7_OUT |
 | C mux A0/A1/EN | **PB3/PB4/PB5** | MAX4619 #1; EN active-low; PB3/PB4 are JTAG pins (SWD unaffected) |
 | R mux A0/A1/EN | **PB6/PB7/PB2** | MAX4619 #2; EN active-low; **not PB8 (BOOT0)** |
 | `R_MODE` (K1 coil) | **PB9** | 5 V relay driver; energised in R mode |
@@ -247,9 +254,9 @@ the UFQFPN48 pin database and the WeAct Long schematic.
 | SWD | PA13/PA14 | Reserved |
 | USB | PA11/PA12 | Reserved (native USB, DFU) |
 | HSE | PF0/PF1 | 8 MHz crystal, confirmed |
-| User button | PC13 | Optional input; active-low to GND |
+| User button | PC13 | Optional input; active-**high** (PC13 → 330 Ω → key → 3.3 V, WeAct V1.0 schematic) |
 
-Free after this map: PA0, PA4, PA15, PC4, PC10, PC11. **PB8 is BOOT0** and must stay unused.
+Free after this map: PA4, PA8, PA15, PC4, PC10, PC11. **PB8 is BOOT0** and must stay unused.
 
 ---
 
@@ -273,8 +280,8 @@ keeps working and nothing pretends the R hardware exists.
 
 ### Stage 2 — when the board is built
 
-1. Verify the C-mode front end on the new pins (PA1/PA8/PB11/PB13/PB15/PB3-5).
-2. Verify COMP1 output polarity and the hardware loop on PA8 with a scope.
+1. Verify the C-mode front end on the new pins (PA1/PA0/PB11/PB13/PB15/PB3-5).
+2. Verify COMP1 output polarity and the hardware loop on PA0 with a scope.
 3. Verify K1/K2 contact states with a multimeter before powering the DUT.
 4. Calibrate `RSENSE_eff` per element and `Rf`/`VBIAS` for the TIA.
 5. Set `ESWCAP_HAS_RMODE=1` and run the Kelvin/TIA bring-up checklist.
@@ -295,7 +302,7 @@ keeps working and nothing pretends the R hardware exists.
 | --- | --- | --- |
 | `status` at boot | banner on PA9/PA10, `SYSCLK 170000000` | console wiring/pins |
 | LED | PC6 lights, active-high | check `PIN_LED`/polarity |
-| C-mode `probe 2` | V_cap responds to drive | PA8 drive/COMP1_OUT mode |
+| C-mode `probe 2` | V_cap responds to drive | PA0 drive/COMP1_OUT mode |
 | Oscillator `zero` | stable T0, no latch | COMP1 `INVERTED` |
 | `mode r` | refuses until `ESWCAP_HAS_RMODE=1` | feature gate |
 | Kelvin, 100 Ω | V_B ≈ 0.405 V, V_N ≈ 0.41 V | OPAMP1 `VINP=PA7/IO2`, Q1 polarity |
@@ -322,9 +329,10 @@ The corrected plan is implemented in the tree:
 - `include/config.h` is the single source of truth and carries the corrected
   combined-board map, plus `ESWCAP_HAS_RMODE` (default 0).
 - LED is PC6/active-high; the console stays on PA9/PA10.
-- COMP1 is `INVERTED`, INP = PA1 (`COMP_INPUT_PLUS_IO1`), and PA8 is both
+- COMP1 is `INVERTED`, INP = PA1 (`COMP_INPUT_PLUS_IO1`), and PA0 is both
   COMP1_OUT (AF8) and the drive-buffer input. The oscillator loop has no CPU in
-  it; PA8 is switched back to GPIO for the RC step.
+  it; PA0 is switched back to GPIO for the RC step. (Originally PA8 — corrected,
+  see §3.9.)
 - OPAMP1 is `VINP = PA7` (`OPAMP_NONINVERTINGINPUT_IO2`), `VINM = PA3`
   (`OPAMP_INVERTINGINPUT_IO0`), `VOUT = PA2`.
 - OPAMP3 buffers `V_N` on PB0/PB1; ADC3_IN1 reads the pin.
@@ -373,7 +381,7 @@ were revised; the full record is in **`docs/pcb-design.md`**.
 | Bipolar C_block | **C1** 1000 µF / 35 V bipolar, 16 mm radial | The polarised 25 V part was reverse-biased by up to 20 V during precharge |
 | Precharge resistor | **R9** 47 Ω 2 W (was 10 Ω) | Limits the AQY212 peak from ~1.7 A to ~0.4 A; 5τ ≈ 250 ms |
 | Per-package decoupling | **C11–C14** 100 nF, **C15** 10 µF on +5 V | Only C8/C9 covered four ICs; no bulk on the relay rail |
-| Fail-safe pulls | **R29** 10 k DRIVE→GND; **R30/R31** 100 k EN→+3V3 | PA8/PB5/PB2 are high-Z at reset |
+| Fail-safe pulls | **R29** 10 k DRIVE→GND; **R30/R31** 100 k EN→+3V3 | PA0/PB5/PB2 are high-Z at reset |
 | Console | **J7** 1×4 (TX=PA9, RX=PA10, GND, +3V3) | PA9/PA10 were NC-flagged, so no host UART |
 | Compensation | **C3** moved from `B` to `VREF` | It was on the non-inverting input (positive feedback) |
 | ADC protection | **R32** 1 k VCAP→PA1 (net `VCAP_ADC`) | Series protection / RC for the ADC |

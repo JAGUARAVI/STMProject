@@ -292,7 +292,7 @@ Only one front-end may drive the DUT.
 
 | Signal | C-mode | R-mode |
 | --- | --- | --- |
-| Drive buffer / COMP1_OUT (PA8) | COMP1 AF in oscillator, GPIO in RC step | **held LOW** (GPIO) |
+| Drive buffer / COMP1_OUT (PA0) | COMP1 AF in oscillator, GPIO in RC step | **held LOW** (GPIO) |
 | C mux (MAX4619 #1) | ON (selected range) | **OFF** |
 | R mux (MAX4619 #2) | **OFF** | ON in Kelvin, OFF in TIA |
 | K1 (`R_MODE`) | **OFF** (B grounded, C_block connected) | **ON** (B lifted, C_block isolated) |
@@ -331,7 +331,7 @@ Rules:
 | `V_B` buffer out | PB12 | LMC6482 B output, ADC4_IN3 |
 | `TIA_OUT` | PA6 | LMC6482 A output, ADC2_IN3 |
 | `VBIAS` (1.65 V) | PA5 | ADC2_IN13 |
-| C drive / `COMP1_OUT` | PA8 | AF8 in oscillator mode, GPIO in RC step |
+| C drive / `COMP1_OUT` | PA0 | AF8 in oscillator mode, GPIO in RC step (not PA8: its AF8 is COMP7) |
 | C mux A0/A1/EN | PB3/PB4/PB5 | MAX4619 #1; EN active-low |
 | R mux A0/A1/EN | PB6/PB7/PB2 | MAX4619 #2; EN active-low; **not PB8 (BOOT0)** |
 | `R_MODE` (K1) | PB9 | 5 V relay driver |

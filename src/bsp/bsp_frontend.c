@@ -185,7 +185,7 @@ bool fe_init(void)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
 
-    /* PA8 starts as a GPIO output low. bsp_comp.c switches it to AF8 when the
+    /* The drive pin (PA0) starts as a GPIO output low. bsp_comp.c switches it to AF8 when the
      * oscillator runs and back when it stops. */
     gpio_out_low(PIN_DRIVE_PORT, PIN_DRIVE);
 
@@ -229,7 +229,7 @@ bool fe_init(void)
 
 void fe_set_drive(bool high)
 {
-    /* Only has an effect while PA8 is a GPIO (the comparator loop is
+    /* Only has an effect while PA0 is a GPIO (the comparator loop is
      * stopped). bsp_comp.c owns the AF/GPIO switch. */
     HAL_GPIO_WritePin(PIN_DRIVE_PORT, PIN_DRIVE,
                       high ? GPIO_PIN_SET : GPIO_PIN_RESET);

@@ -43,7 +43,7 @@ typedef enum {
 bool fe_init(void);
 
 /** Raw C-mode control. `fe_set_drive` is only valid when the comparator loop
- *  is stopped: PA8 must be a GPIO at that point (bsp_comp.c owns the switch). */
+ *  is stopped: PA0 must be a GPIO at that point (bsp_comp.c owns the switch). */
 void fe_set_drive(bool high);
 void fe_select_range(uint8_t range_idx);
 uint8_t fe_selected_range(void);

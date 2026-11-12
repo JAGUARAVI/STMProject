@@ -316,7 +316,7 @@ bool rmode_enter(void)
         return false;
     }
 
-    /* C-mode oscillator off; PA8 back to GPIO. */
+    /* C-mode oscillator off; PA0 back to GPIO. */
     comp_loop_stop();
     bsp_dac3_enable(false);
 

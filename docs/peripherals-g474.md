@@ -18,7 +18,7 @@ These are board-level, not silicon-level; they were checked against the WeAct
 | Fact | Value | Consequence |
 | --- | --- | --- |
 | User LED | **PC6, active high** (`PC6 -> 5.1k -> LED -> GND`) | `PIN_LED = PC6`, `LED_ACTIVE_LOW = 0` |
-| User button | **PC13**, active low to GND | not an LED |
+| User button | **PC13**, active **high** (`PC13 -> 330R -> key -> 3.3 V`) | not an LED; needs the internal pull-down |
 | Console | **PA9/PA10**, USART1 AF7, on header P1 | no on-board USB-UART; the Type-C is native USB on PA11/PA12 |
 | PC5 | **not bonded** on UFQFPN48 | never assign a signal to it |
 | PB8 | **BOOT0** on this board | do not use it for a mux/relay |
@@ -311,7 +311,7 @@ TIM20** (TIM5/TIM8 pins are not bonded).
 184 ps resolution, 6 timers A–F. On UFQFPN48 only **timers A and B** are
 reachable: `CHA1=PA8`, `CHA2=PA9`, `CHB1=PA10`, `CHB2=PA11` (AF13).
 Requires DLL calibration (`HAL_HRTIM_DLLCalibrationStart` + poll) before use.
-**Conflict:** PA8 is also a candidate `COMP1_OUT` pin — cannot be both.
+PA8 is **not** a COMP1_OUT pin (its AF8 is COMP7_OUT); COMP1_OUT is on PA0 in this design, so there is no conflict.
 
 ### 6.3 Timer → ADC triggering
 

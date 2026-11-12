@@ -7,13 +7,15 @@
  *
  *   ESP32                                  G474
  *   LM393 + 10k/10k divider + 100k hyst    COMP1 + DAC3_CH1 threshold
- *   GPIO ISR mirrors comparator to drive   COMP1_OUT on PA8 closes the loop
+ *   GPIO ISR mirrors comparator to drive   COMP1_OUT on PA0 closes the loop
  *   PCNT / reciprocal edge timing          TIM2 32-bit input capture via DMA
  *   ISR latency inside the measurement     no CPU in the loop at all
  *
  * ## Why the loop is fully hardware
  *
- * PA8 is both COMP1_OUT (AF8) and the input of the SN74LVC1G34 drive buffer.
+ * PA0 is both COMP1_OUT (AF8) and the input of the SN74LVC1G34 drive buffer.
+ * (Not PA8: on this package PA8's AF8 is COMP7_OUT. COMP1_OUT exists only on
+ * PA0, PA6, PA11 and PB8; see config.h.)
  * The comparator therefore drives the range network directly: when V_cap is
  * below the threshold the buffer drives high and charges it; when V_cap crosses
  * the threshold the buffer drives low and discharges it. No interrupt runs at
@@ -46,7 +48,7 @@
  * STM32F3, whose `COMP_CSR.OUTSEL` served this purpose), which is why this can
  * look impossible if you only read the COMP chapter.
  *
- * The same node is also available on PA8 for a scope, and that is what closes
+ * The same node is also available on PA0 for a scope, and that is what closes
  * the oscillator loop. The timer does not use the pin.
  */
 
@@ -90,9 +92,9 @@ static uint16_t s_threshold_mv;
 /* ------------------------------------------------------------------------- */
 
 /**
- * @brief Put PA8 under COMP1's control.
+ * @brief Put the drive pin (PA0) under COMP1's control.
  *
- * AF8 is COMP1_OUT. The pin then carries the (polarity-corrected) comparator
+ * AF8 on PA0 is COMP1_OUT. The pin then carries the (polarity-corrected) comparator
  * output straight into the drive buffer, which is the whole point of the
  * hardware loop.
  */
@@ -104,12 +106,12 @@ static void drive_pin_comparator(void)
     gpio.Mode      = GPIO_MODE_AF_PP;
     gpio.Pull      = GPIO_NOPULL;
     gpio.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    gpio.Alternate = GPIO_AF8_COMP1;
+    gpio.Alternate = PIN_DRIVE_AF;
     HAL_GPIO_Init(PIN_DRIVE_PORT, &gpio);
 }
 
 /**
- * @brief Return PA8 to a plain GPIO output, driven low.
+ * @brief Return the drive pin (PA0) to a plain GPIO output, driven low.
  *
  * Used for the RC-step method, where the firmware issues the excitation edge
  * itself. The external 10k pull-down on the buffer input keeps the drive low
@@ -220,9 +222,11 @@ bool comp_init(void)
     s_hcomp1.Instance = COMP1;
     s_hcomp1.Init.InputPlus = COMP_INPUT_PLUS_IO1;      /* PA1 = V_cap */
     s_hcomp1.Init.InputMinus = COMP_INPUT_MINUS_DAC3_CH1;
-    /* 20 mV of hysteresis replaces the LM393's 100k positive-feedback resistor,
-     * and unlike it this is a fixed, characterised value. */
-    s_hcomp1.Init.Hysteresis = COMP_HYSTERESIS_20MV;
+    /* The hysteresis replaces the LM393's 100k positive-feedback resistor and
+     * sets the oscillator swing, hence K. 70 mV is the largest G4 setting
+     * (K ~= 0.085); 20 mV gave K ~= 0.024, which the calibration solver
+     * rejects and which leaves the swing buried in noise. See config.h. */
+    s_hcomp1.Init.Hysteresis = OSC_COMP_HYSTERESIS;
     /* INVERTED is mandatory: the drive buffer is non-inverting, so the loop
      * needs "drive high while V_cap is below the threshold". See the file
      * header. */
@@ -326,7 +330,7 @@ bool comp_output(void)
 /**
  * @brief Start the relaxation loop.
  *
- * PA8 becomes COMP1_OUT, COMP1 is enabled, and TIM2 begins capturing. There is
+ * PA0 becomes COMP1_OUT, COMP1 is enabled, and TIM2 begins capturing. There is
  * no CPU in the loop: the comparator drives the buffer, the buffer drives the
  * range network, and TIM2 timestamps the edges.
  */
@@ -357,7 +361,7 @@ void comp_loop_stop(void)
 
     __HAL_TIM_DISABLE(&s_htim2);
 
-    /* Disable the comparator before handing PA8 back to GPIO, so the pin does
+    /* Disable the comparator before handing PA0 back to GPIO, so the pin does
      * not glitch high through the AF path. */
     comp_enable(false);
     bsp_dac3_enable(false);

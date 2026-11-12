@@ -1,6 +1,13 @@
 # Rev C plan — USB-only power, true 4-wire C/R, corrected J8 bias header
 
-**Status:** design plan, not yet implemented. Supersedes the Rev B power/relay
+**Status:** design plan, not yet implemented.
+
+> **Pin conflict (2026-11-12): PA0 is no longer free.** PA0 is now the C-mode
+> `DRIVE` / COMP1_OUT pin, because PA8 cannot output COMP1 (its AF8 is
+> COMP7_OUT; see `docs/pcb-design.md`, "DRIVE moves from PA8 to PA0"). Every
+> `BIAS_MON = PA0 / ADC1_IN1` below must move. Suggested replacement: **PA8 /
+> J1-15 / ADC5_IN1**, which the move frees (ST pin data lists `ADC5_IN1` on
+> PA8). Not yet applied to the tables in this plan. Supersedes the Rev B power/relay
 arrangement and the earlier J8 pin proposal.
 **Scope:** ESWCap combined C+R carrier for the WeAct STM32G474 “Long” module.
 **Decisions already confirmed:** second LMC6482 allowed; J8 is 1×8; J5 is a

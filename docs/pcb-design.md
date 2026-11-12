@@ -72,13 +72,37 @@ were fixed in the schematic and carried into the PCB.
 | B2 | **C1 = 1000 µF / 35 V bipolar electrolytic**, non-polarised 16 mm radial footprint | The original polarised 25 V part was reverse-biased by up to 20 V during precharge (V_BIAS → N_DUT → C_block → V_cap held at 0). The CP symbol is retained for library continuity; its `+` mark is not used. |
 | B3 | **R9 = 47 Ω, 2 W 2512** (was 10 Ω) | 10 Ω gave ~1.7 A peak through the AQY212s (0.55 A rated) and 170 mJ in R9. 47 Ω limits the peak to ~0.4 A; 5τ ≈ 250 ms, well inside the firmware's 2 s precharge hold. |
 | M1 | Added **C11–C14 100 nF** (one per U1/U2/U3/U4 package) and **C15 10 µF** on +5 V | Only C8/C9 existed for four packages; no bulk on the relay rail. |
-| M2 | Added **R29 10 k** DRIVE→GND, **R30/R31 100 k** MUXC_EN/MUXR_EN→+3V3 | PA8/PB5/PB2 are high-Z at reset; the buffer input could float and either mux could be enabled. The pull-ups disable both muxes (ENABLE is active-low). |
+| M2 | Added **R29 10 k** DRIVE→GND, **R30/R31 100 k** MUXC_EN/MUXR_EN→+3V3 | PA0 (was PA8)/PB5/PB2 are high-Z at reset; the buffer input could float and either mux could be enabled. The pull-ups disable both muxes (ENABLE is active-low). |
 | M3 | Added **J7 console header** (TX=PA9, RX=PA10, GND, +3V3) and removed the NC flags on J1-13/14 | The console pins were marked no-connect, leaving no host UART. |
 | M5 | **C3 moved from OP1_OUT–B to OP1_OUT–VREF** | C3 was on the non-inverting input (positive feedback around the op-amp). The conventional compensation node is the inverting input (VREF). |
 | m1 | J3-2/J3-3 and J4-2/J4-3 tied to GND/GND and 5V/3V3 | The module has two pins per power rail; leaving the duplicates open halves the current path. |
 | m2 | **R32 1 k** in series between VCAP and J2-7/PA1 | Protects the ADC input and forms a small RC with the sample capacitor. New net `VCAP_ADC`. |
 | m4 | **R33 1 M** across C1 | Bleeds the 1000 µF block when the instrument is idle; SSR3 alone could not discharge V_cap without also asserting SSR1. |
 | M4 | R10 moved to 2512 (1 W pulse), R11 marked 0.5 W pulse | 187 mJ precharge/discharge energy; 0805 parts are marginal. |
+
+### Pending schematic/PCB change — DRIVE moves from PA8 to PA0 (2026-11-12)
+
+**Must be applied in KiCad before fabrication.** The C-mode drive / COMP1
+output net (`DRIVE`, the SN74LVC1G34 U2 input with the R29 10 k pull-down) is
+wired to **J1-15 = WeAct P1-15 = PA8**. That pin cannot carry COMP1_OUT on the
+STM32G474CEU6: ST's GPIO data (`GPIO-STM32G47x_gpio_v1_0`) gives
+**PA8 AF8 = COMP7_OUT**, and lists COMP1_OUT only on **PA0, PA6, PA11, PB8**
+(PA0 = `GPIO_AF8_COMP1`). With the board as drawn the oscillator never starts.
+
+| | Before | After |
+|---|---|---|
+| `DRIVE` net | {J1-15, U2 input, R29-1} | {**J2-6**, U2 input, R29-1} |
+| J1-15 (PA8) | `DRIVE` | **no connect** (mark NC) |
+| J2-6 (PA0) | unused | `DRIVE` |
+
+- PA0 is free on the WeAct Long module (schematic V1.0: MCU pin 8 → P2-6 only,
+  no pull resistor), and unused elsewhere in this design.
+- Keep R29 (10 k to GND) at U2's input; PA0 is high-Z at reset like PA8 was.
+- Route J2-6 → U2 input on the top side, away from `V_cap`/`N_DUT`: it is a
+  fast 0–3.3 V square wave in oscillator mode.
+- No part is added or removed; only one net moves.
+- Firmware already uses PA0 (`PIN_DRIVE` in `include/config.h`).
+- After the change, re-run ERC/DRC and regenerate the fab outputs.
 
 ### Review findings checked and rejected
 

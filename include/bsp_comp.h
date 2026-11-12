@@ -10,8 +10,8 @@
  *    so at 170 MHz it gives 5.88 ns resolution with a 25.3 s wrap and needs no
  *    overflow bookkeeping across the 10 Hz .. 1 MHz band.
  *  - Loop closure: the oscillator is a relaxation loop, so the comparator
- *    output must drive the excitation buffer. PA8 is both COMP1_OUT (AF8) and
- *    the buffer input, so the loop is closed in hardware with no CPU in it.
+ *    output must drive the excitation buffer. PA0 is both COMP1_OUT (AF8) and
+ *    the buffer input (PA8 cannot be: its AF8 is COMP7_OUT), so the loop is closed in hardware with no CPU in it.
  *    The same pin is switched to GPIO for the RC-step method.
  */
 

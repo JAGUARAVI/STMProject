@@ -377,7 +377,7 @@ implementation assumes; each is isolated so it can be changed without a rewrite.
 | 6 | RTOS | **Bare-metal superloop** | `src/app.c` |
 | 7 | Switch polarity | **SSR and relay drive active-high**, MAX4619 `EN` active-low. Each is isolated behind one helper | `FE_SSR_ACTIVE_HIGH`, `FE_RELAY_ACTIVE_HIGH`, `FE_MUX_EN_ACTIVE_LOW` in `bsp_frontend.c` |
 | 8 | ADC oversampling | **Mean-preserving** (`shift = log2(ratio)`), so codes stay on the 0..4095 scale and ratios are exact | `bsp_adc.c` |
-| 9 | Oscillator loop | **Fully hardware**: PA8 is COMP1_OUT (AF8) and the drive-buffer input, so the comparator closes the loop with no CPU. TIM2 captures the period via `TISEL.TI1SEL = 1`. PA8 is switched back to GPIO for the RC step | `bsp_comp.c` |
+| 9 | Oscillator loop | **Fully hardware**: PA0 is COMP1_OUT (AF8) and the drive-buffer input, so the comparator closes the loop with no CPU. TIM2 captures the period via `TISEL.TI1SEL = 1`. PA0 is switched back to GPIO for the RC step. (Not PA8: its AF8 is COMP7_OUT.) COMP1 hysteresis is 70 mV, K ≈ 0.085 | `bsp_comp.c` |
 
 **Still requires hardware:** items 1, 2, 7 and 9 cannot be proven without the
 board. They are written so a wrong assumption is a local edit, not a redesign.

@@ -44,15 +44,16 @@ static const double s_rm_default[4] = {
  * @brief Restore compiled defaults in RAM.
  *
  * Defaults are deliberately conservative: the oscillator starts with an
- * un-tared unit-K model and no ADC calibration, which makes the firmware
- * usable but not accurate until the operator runs the calibration commands.
+ * un-tared nominal-K model (OSC_K_NOMINAL, from the COMP1 hysteresis) and
+ * no ADC calibration, which makes the firmware usable but not accurate until
+ * the operator runs the calibration commands.
  */
 void cal_defaults(void)
 {
     memset(&s_rec, 0, sizeof(s_rec));
 
     for (int i = 0; i < RANGE_COUNT; ++i) {
-        s_osc[i].k = 1.0;
+        s_osc[i].k = OSC_K_NOMINAL;
         s_osc[i].delay_us = 0.0;
         s_osc[i].t0_us = 0.0;
         s_osc[i].valid = false;
@@ -253,7 +254,7 @@ void cal_osc_clear(uint8_t r)
     if (r >= RANGE_COUNT) {
         return;
     }
-    s_osc[r].k = 1.0;
+    s_osc[r].k = OSC_K_NOMINAL;
     s_osc[r].delay_us = 0.0;
     s_osc[r].t0_us = 0.0;
     s_osc[r].valid = false;

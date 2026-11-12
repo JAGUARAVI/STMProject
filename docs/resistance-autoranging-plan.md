@@ -234,7 +234,7 @@ G474CE pin database, RM0440 and the local CubeG4 package:
 | **LMC6482 A** | TIA: `IN+=VBIAS`, `IN-=B`, `OUT=TIA_OUT` | 20 fA input bias; the internal op-amp Ib is the 1 GΩ limit |
 | **LMC6482 B** | `V_B` buffer: `IN+=B`, `IN-=OUT`, `OUT=ADC_VB` | 20 fA; B can be 4.7 MΩ source in the top Kelvin range |
 | **K1, K2** | Omron G6S-2 DC5 DPDT: `K1A` B↔GND, `K1B` N_DUT↔C_block, `K2A` B↔R mux, `K2B` TIA feedback | two Form C contacts each; low leakage; 5 V coils; fail-safe C state |
-| **COMP1** | C-mode relaxation oscillator: `INP=PA1(V_cap)`, `INM=DAC3_CH1`, `OUT=PA8` | hardware loop; replaces LM393 and the ISR; PA1 is both ADC1_IN2 and COMP1_INP |
+| **COMP1** | C-mode relaxation oscillator: `INP=PA1(V_cap)`, `INM=DAC3_CH1`, `OUT=PA0` (PA8's AF8 is COMP7, not COMP1) | hardware loop; replaces LM393 and the ISR; PA1 is both ADC1_IN2 and COMP1_INP |
 | **COMP4** | `V_N` overvoltage flag: `INP=PB0(V_N_SENSE)`, `INM=DAC1_CH1` | one comparator, no pin; EXTI shutdown |
 | **COMP5** | TIA saturation flag: `INP=PB13(TIA_OUT)`, `INM=DAC4_CH1` | optional; detects TIA output below ~0.1 V |
 | **DAC3_CH1** | COMP1 threshold, 1.65 V | internal, no pin |
@@ -284,20 +284,21 @@ G474CE pin database, RM0440 and the local CubeG4 package:
 ### 4.1 Hardware oscillator
 
 ```
- PA8 (COMP1_OUT, inverted) ──► SN74LVC1G34 ──► C mux U3 ──► R_range ──► V_cap
+ PA0 (COMP1_OUT, inverted) ──► SN74LVC1G34 ──► C mux U3 ──► R_range ──► V_cap
         ▲                                                                  │
         │                                                                  │
-     COMP1 INP = PB1 ◄──────────────────────────────────────────────────────┘
+     COMP1 INP = PA1 ◄──────────────────────────────────────────────────────┘
      COMP1 INM = DAC3_CH1 = 1.65 V
      COMP1 OUT ──► TIM2_CH1 (internal capture)
 ```
 
-- COMP1 output polarity is set so `PA8` is **high when `V_cap` is below the
+- COMP1 output polarity is set so `PA0` is **high when `V_cap` is below the
   lower threshold**. That is the drive phase; the buffer then charges the RC
   network until the upper threshold, when the comparator output goes low.
-- The comparator has programmable hysteresis. Start at 20 mV; the effective
-  thresholds are 1.65 V ± 10 mV. The exact values are calibrated.
-- `PA8` is a dual-purpose pin:
+- The comparator has programmable hysteresis. Use 70 mV (the G4 maximum);
+  20 mV gives K ≈ 0.024, too small a swing to calibrate reliably. The exact
+  thresholds (and hence K ≈ 0.085) are calibrated.
+- `PA0` is a dual-purpose pin:
   - **Oscillator:** COMP1 alternate function, push-pull output.
   - **RC step:** GPIO output high; the comparator is disabled.
   A 10 kΩ pull-down on the buffer input defines drive low when COMP1 is off.
@@ -311,8 +312,8 @@ G474CE pin database, RM0440 and the local CubeG4 package:
 
 ### 4.2 RC-step mode
 
-- Drive `PA8` high as a GPIO; the buffer steps the selected range resistor.
-- `TIM6` triggers `ADC1` (PA0, `V_cap`) into a circular DMA buffer.
+- Drive `PA0` high as a GPIO; the buffer steps the selected range resistor.
+- `TIM6` triggers `ADC1` (PA1, `V_cap`) into a circular DMA buffer.
 - Per-range oversampling: small ratios for fast ranges, 64–256× for slow ones.
   The ESP32's software-poll jitter and adaptive decimation disappear.
 - Fit `V(t) = V_inf − (V_inf − V0)·e^(−(t−t0)/τ)`; `C_eq = τ / R_eff`.
@@ -492,7 +493,7 @@ Interlocks:
 | PA5 | `VBIAS` — `ADC2_IN13` | 1.65 V TIA reference |
 | PA6 | `TIA_OUT` — `ADC2_IN3` | LMC6482 A output; BAV199 clamp |
 | PA7 | `B` — `OPAMP1_VINP2`, `ADC2_IN4` | Kelvin sense |
-| PA8 | `COMP1_OUT` / drive buffer; GPIO for RC step | 10 kΩ pull-down on buffer input |
+| PA0 | `COMP1_OUT` / drive buffer; GPIO for RC step | 10 kΩ pull-down on buffer input (was PA8, which cannot output COMP1) |
 | PA9/PA10 | `USART1_TX/RX` | console |
 | PA11/PA12 | USB D−/D+ | reserved |
 | PA13/PA14 | SWD | reserved |
@@ -514,7 +515,7 @@ Interlocks:
 | PB15 | `VBIAS_RETURN` | held low in the safe state |
 | PC4 | spare | PC5 is not bonded |
 | PC6 | user LED | active-high |
-| PC13 | user button | active-low |
+| PC13 | user button | active-high |
 | PC14/PC15 | OSC32 | optional |
 | PF0/PF1 | HSE 8 MHz | reserved |
 
