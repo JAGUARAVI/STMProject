@@ -4878,38 +4878,10 @@
 	)
 	(wire
 		(pts
-			(xy 299.72 85.09)
-			(xy 302.26 85.09)
-		)
-		(uuid "2e61a804-da83-4d52-a79c-20d24b914b23")
-	)
-	(wire
-		(pts
-			(xy 299.72 115.57)
-			(xy 302.26 115.57)
-		)
-		(uuid "496d412c-df5e-46cd-a0d0-29f7f7af513e")
-	)
-	(wire
-		(pts
 			(xy 309.88 85.09)
 			(xy 312.42 85.09)
 		)
 		(uuid "cade7685-7e8a-4c46-a7ca-7837521877f7")
-	)
-	(wire
-		(pts
-			(xy 299.72 95.25)
-			(xy 302.26 95.25)
-		)
-		(uuid "4017a435-a09b-4177-869a-9f222a2597a0")
-	)
-	(wire
-		(pts
-			(xy 299.72 105.41)
-			(xy 302.26 105.41)
-		)
-		(uuid "cb820368-6cc5-41e1-a43c-406a637b997e")
 	)
 	(wire
 		(pts
@@ -5128,6 +5100,34 @@
 		)
 		(uuid "4cc0fe49-7aff-4ec3-b646-5a5b4038b182")
 	)
+	(wire
+		(pts
+			(xy 299.72 85.09)
+			(xy 297.18 85.09)
+		)
+		(uuid "7e62c2f9-f140-4049-a7db-22b0175d4f75")
+	)
+	(wire
+		(pts
+			(xy 299.72 95.25)
+			(xy 297.18 95.25)
+		)
+		(uuid "6775b0d3-115c-4f37-aa16-99d16d2bf1d5")
+	)
+	(wire
+		(pts
+			(xy 299.72 105.41)
+			(xy 297.18 105.41)
+		)
+		(uuid "9a46fd32-b342-4996-99c3-bcef58249a8d")
+	)
+	(wire
+		(pts
+			(xy 299.72 115.57)
+			(xy 297.18 115.57)
+		)
+		(uuid "7e3b81c2-b96e-4059-9778-b9b7c780d2bd")
+	)
 	(text "C: DRIVE -> C mux -> Rrange -> V_cap -> C1/C2 -> K1B -> N_DUT -> DUT -> B -> K1A -> GND"
 		(at 104 24 0)
 		(effects
@@ -5189,6 +5189,17 @@
 			(justify left bottom)
 		)
 		(uuid "e8deccf6-8f9a-49e5-a0d7-aebaff1b1bc2")
+	)
+	(text "REV C: USB-only; 4-wire C/R; OPAMP3 SH buffer; J5 FH/SH/SL/FL; PA0=DRIVE, PA8=BIAS_MON"
+		(at 40 25 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "d63d5e81-a1f6-498b-9cd9-5c36fe53f4cd")
 	)
 	(label "GND"
 		(at 38.1 124.46 0)
@@ -7580,26 +7591,6 @@
 		)
 		(uuid "62b227ab-9c27-49b8-ae68-08a60f2dab81")
 	)
-	(label "SH"
-		(at 302.26 85.09 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "c38b857b-7436-427b-b3a8-ea1ac661e7b3")
-	)
-	(label "SH"
-		(at 302.26 115.57 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "46ccbcf9-9063-4056-89a8-8cbd4e199875")
-	)
 	(label "SH_DIV"
 		(at 312.42 85.09 0)
 		(effects
@@ -7609,26 +7600,6 @@
 			(justify left bottom)
 		)
 		(uuid "0e62b2d6-0d61-4f3e-a514-57339d85bdeb")
-	)
-	(label "SH_DIV"
-		(at 302.26 95.25 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "ed9576ff-f33b-47b4-8d46-138b74490a6f")
-	)
-	(label "SH_DIV"
-		(at 302.26 105.41 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "e3a5dd2c-fdfa-4323-8153-692ed911de42")
 	)
 	(label "SH_DIV"
 		(at 312.42 115.57 0)
@@ -7659,16 +7630,6 @@
 			(justify left bottom)
 		)
 		(uuid "0b95c879-1ba7-49b6-99db-0e5b1f4fb31d")
-	)
-	(label "SH_DIV"
-		(at 312.42 115.57 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "14e47101-4153-4650-b93a-0850678ce17c")
 	)
 	(label "C_MODE_SW"
 		(at 38.1 71.12 0)
@@ -7960,10 +7921,50 @@
 		)
 		(uuid "0ed90884-924a-404a-9507-2a7c7c676cf1")
 	)
-  (text "REV C: USB-only; 4-wire C/R; OPAMP3 SH buffer; J5 FH/SH/SL/FL; PA0=DRIVE, PA8=BIAS_MON"
-    (at 40 25 0)
-    (effects (font (size 1.5 1.5) (bold yes)) (justify left bottom))
-    (uuid "d63d5e81-a1f6-498b-9cd9-5c36fe53f4cd")
+	(label "SH"
+		(at 297.18 85.09 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b75d1931-f339-47ee-9887-d8d6817f2d4c")
+	)
+	(label "SH_DIV"
+		(at 297.18 95.25 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "09f0c500-ec98-48c6-9dd0-4bb81aa5ad1b")
+	)
+	(label "SH_DIV"
+		(at 297.18 105.41 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5db6c4fa-6b20-4b26-bf42-4795ca1a0597")
+	)
+	(label "SH"
+		(at 297.18 115.57 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "393650b0-e7c4-40c0-96c6-abdd32cd30ed")
+	)
+  (text "AQY221N2VY (SSOP-4) for U5-U7/U9/U10; C7=10pF C0G; R9=100R precharge; R-mode: firmware subtracts I_div=V_SH/11M (R38/R39 0.1%)"
+    (at 40 28 0)
+    (effects (font (size 1.2 1.2)) (justify left bottom))
+    (uuid "47314eff-8c2a-4ba1-b872-192852424d0b")
   )
 	(symbol
 		(lib_id "eswcap:Conn_01x20")
@@ -9649,15 +9650,16 @@
 				)
 			)
 		)
-		(property "Value" "AQY212"
+		(property "Value" "AQY221N2VY"
 			(at 129.54 106.68 0)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "eswcap:DIP-4_W7.62mm"
+		(property "Footprint" "eswcap:AQY221N2VY_SSOP-4"
 			(at 129.54 100.33 0)
 			(hide yes)
 			(effects
@@ -9709,7 +9711,7 @@
 				)
 			)
 		)
-		(property "Value" "47"
+		(property "Value" "100"
 			(at 129.54 116.84 0)
 			(effects
 				(font
@@ -9838,15 +9840,16 @@
 				)
 			)
 		)
-		(property "Value" "AQY212"
+		(property "Value" "AQY221N2VY"
 			(at 185.42 106.68 0)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "eswcap:DIP-4_W7.62mm"
+		(property "Footprint" "eswcap:AQY221N2VY_SSOP-4"
 			(at 185.42 100.33 0)
 			(hide yes)
 			(effects
@@ -10027,15 +10030,16 @@
 				)
 			)
 		)
-		(property "Value" "AQY212"
+		(property "Value" "AQY221N2VY"
 			(at 240.03 106.68 0)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "eswcap:DIP-4_W7.62mm"
+		(property "Footprint" "eswcap:AQY221N2VY_SSOP-4"
 			(at 240.03 100.33 0)
 			(hide yes)
 			(effects
@@ -10516,7 +10520,7 @@
 				)
 			)
 		)
-		(property "Value" "1nF"
+		(property "Value" "10pF"
 			(at 231.14 184.15 0)
 			(effects
 				(font
@@ -13219,7 +13223,7 @@
 				)
 			)
 		)
-		(property "Value" "1M"
+		(property "Value" "1M 0.1%"
 			(at 304.8 99.06 0)
 			(effects
 				(font
@@ -13399,15 +13403,16 @@
 				)
 			)
 		)
-		(property "Value" "AQY212"
+		(property "Value" "AQY221N2VY"
 			(at 160.02 187.96 0)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "eswcap:DIP-4_W7.62mm"
+		(property "Footprint" "eswcap:AQY221N2VY_SSOP-4"
 			(at 160.02 180.34 0)
 			(hide yes)
 			(effects
@@ -13579,15 +13584,16 @@
 				)
 			)
 		)
-		(property "Value" "AQY212"
+		(property "Value" "AQY221N2VY"
 			(at 209.55 167.64 0)
+			(hide yes)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "eswcap:DIP-4_W7.62mm"
+		(property "Footprint" "eswcap:AQY221N2VY_SSOP-4"
 			(at 209.55 160.02 0)
 			(hide yes)
 			(effects

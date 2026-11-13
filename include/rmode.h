@@ -61,8 +61,12 @@ bool   rmode_tia_valid(void);
 
 /* Pure maths, exposed for host tests. */
 double rmode_resistance(double rref_ohm, double vn_mv, double vb_mv);
+double rmode_resistance_div(double rref_ohm, double vn_mv, double vb_mv,
+                            double rdiv_ohm);
 double rmode_tia_resistance(double rf_ohm, double vn_mv, double vbias_mv,
                             double vtia_mv);
 double rmode_current_ua(double rref_ohm, double vb_mv);
+double rmode_current_ua_div(double rref_ohm, double vn_mv, double vb_mv,
+                            double rdiv_ohm);
 
 #endif /* ESWCAP_RMODE_H */

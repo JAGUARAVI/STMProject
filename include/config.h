@@ -263,6 +263,11 @@
 #define RMODE_RF_OHM        10.0e6
 #define RMODE_CF_F          10.0e-12
 
+/* C-mode SH sense divider (R38 10M + R39 1M).  It is permanently connected
+ * to SH, so in R-mode its current bypasses the DUT and must be subtracted
+ * from the force current.  R38/R39 are 0.1% parts. */
+#define RMODE_SH_DIV_OHM    11.0e6
+
 /* Compliance and resolution gates.
  *
  * RMODE_MIN_DV_MV is the smallest V_N - V_B worth trusting: 3 mV is about

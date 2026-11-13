@@ -23,6 +23,47 @@ double rmode_resistance(double rref_ohm, double vn_mv, double vb_mv)
     return rref_ohm * (vn_mv - vb_mv) / vb_mv;
 }
 
+/**
+ * @brief Kelvin current with the permanently-connected SH divider removed.
+ *
+ * The C-mode 10M/1M divider loads SH in every mode.  In R-mode its current
+ * does not flow through the DUT, so the force current inferred from V_B is
+ * larger than the DUT current.  Subtract I_div = V_SH / R_div before dividing
+ * the measured DUT voltage by it.
+ *
+ * Returns -1 when the corrected current is not positive; that means the
+ * divider current alone exceeds the force current and the Kelvin result is
+ * not physical (the autorange should move to a larger element or the TIA).
+ */
+double rmode_current_ua_div(double rref_ohm, double vn_mv, double vb_mv,
+                            double rdiv_ohm)
+{
+    if (rref_ohm <= 0.0 || rdiv_ohm <= 0.0 ||
+        vb_mv < RMODE_VB_MIN_MV || vn_mv <= vb_mv) {
+        return -1.0;
+    }
+
+    double i_force = (vb_mv * 1e-3) / rref_ohm;
+    double i_div   = (vn_mv * 1e-3) / rdiv_ohm;
+    double i_dut   = i_force - i_div;
+
+    if (!(i_dut > 0.0)) {
+        return -1.0;
+    }
+    return i_dut * 1e6;
+}
+
+double rmode_resistance_div(double rref_ohm, double vn_mv, double vb_mv,
+                            double rdiv_ohm)
+{
+    double i_dut_ua = rmode_current_ua_div(rref_ohm, vn_mv, vb_mv, rdiv_ohm);
+    if (i_dut_ua <= 0.0) {
+        return -1.0;
+    }
+    /* mV / uA = kohm; scale to ohms. */
+    return (vn_mv - vb_mv) / i_dut_ua * 1e3;
+}
+
 double rmode_tia_resistance(double rf_ohm, double vn_mv, double vbias_mv,
                             double vtia_mv)
 {

@@ -488,6 +488,27 @@ static void test_rmode_kelvin_rejects(void)
     ok();
 }
 
+static void test_rmode_kelvin_divider(void)
+{
+    begin("Kelvin divider correction removes the SH load");
+
+    /* The 10M/1M divider is permanently on SH.  Solve the network for a 1M
+     * DUT on the 4.7M element, then check that the corrected equation returns
+     * the DUT and the uncorrected one is badly low. */
+    const double rref = 4.7e6;
+    const double r_dut = 1.0e6;
+    const double rdiv = 11.0e6;
+    const double vb = 405.0;
+
+    double vn = (vb / rref + vb / r_dut) / (1.0 / r_dut + 1.0 / rdiv);
+    CHECK_NEAR(rmode_resistance_div(rref, vn, vb, rdiv), r_dut, r_dut * 0.002);
+    CHECK(rmode_resistance(rref, vn, vb) < 0.6 * r_dut);
+
+    /* If the divider current exceeds the force current, reject. */
+    CHECK(rmode_resistance_div(rref, 1500.0, vb, rdiv) < 0.0);
+    ok();
+}
+
 static void test_rmode_tia(void)
 {
     begin("TIA equation recovers R from V_N, VBIAS and V_TIA");
@@ -602,6 +623,7 @@ int main(void)
     test_cal_rmode_setters();
 
     test_rmode_kelvin();
+    test_rmode_kelvin_divider();
     test_rmode_kelvin_rejects();
     test_rmode_tia();
     test_rmode_tia_rejects();

@@ -10,10 +10,11 @@ authoritative version.
 > - **No second LMC6482 is used.** The second LMC6482 is not available. U8 and
 >   C19 were removed. The C-mode `SH` divider is now buffered by the **internal
 >   STM32 OPAMP3** (the same OPAMP3 that buffers `V_N` in R-mode).
-> - **U9 / U10 AQY212 selector.** U9 isolates the `SH → R20 → VN_SENSE` branch
->   when K1 is off (C-mode). U10 connects `SH_DIV` to `VN_SENSE` when K1 is off
->   (C-mode). Both are AQY212 spares; U9 is driven from the K1 coil, U10 from
->   **PC4 (`C_MODE_SW`, active low)**.
+> - **U5–U7 / U9 / U10 are AQY221N2VY** (SSOP-4, 1 pF, 10 nA max leakage,
+>   120 mA). U9 isolates the `SH → R20 → VN_SENSE` branch when K1 is off
+>   (C-mode). U10 connects `SH_DIV` to `VN_SENSE` when K1 is off (C-mode).
+>   U9 is driven from the K1 coil, U10 from **PC4 (`C_MODE_SW`, active low)**.
+>   R9 is **100 Ω** to keep the 20 V precharge under the 300 mA peak rating.
 > - **PA0 is now `DRIVE` / COMP1_OUT**, per the 2026-11-12 firmware fix. PA8 is
 >   freed and is now **`BIAS_MON` on J1-15 / ADC5_IN1**. `BIAS_SET` stays on
 >   PA4/TIM3_CH2; `BIAS_EN` stays on PA15; UART stays on PC10/PC11.
@@ -22,9 +23,13 @@ authoritative version.
 > - **R20 is 100 kΩ**, D2 is **BAV199**, and the `V_N` branch is isolated in
 >   C-mode by U9.
 > - **Divider compensation:** C20 = **100 pF across the 1 MΩ bottom leg**;
->   C21 = **10 pF across the 10 MΩ top leg**. This gives matched time constants.
-> - **BOM:** 88 physical parts, 46 grouped lines, 3 PWR_FLAGs. U1 is the only
->   LMC6482; U5–U7 + U9 + U10 are AQY212; R20/R40 are 100 kΩ; R41/R43 are
+>   C21 = **10 pF across the 10 MΩ top leg**. R38 and R39 are both **0.1%**.
+>   C7 is **10 pF C0G**, moving the 4TP pole to ≈17.7 kHz.
+> - **SH divider current:** the divider is permanently connected to `SH`, so
+>   the R-mode firmware subtracts `I_div = V_SH / 11 MΩ` from the Kelvin force
+>   current before computing R.
+> - **BOM:** 88 physical parts, 45 grouped lines, 3 PWR_FLAGs. U1 is the only
+>   LMC6482; U5–U7 + U9 + U10 are AQY221N2VY; R20/R40 are 100 kΩ; R41/R43 are
 >   330 Ω; D2 is BAV199.
 > - **KiCad files:** schematic, project, symbol/footprint libraries and BOM are
 >   in `hardware/kicad/` and `hardware/fab/`. The PCB is not part of this push.

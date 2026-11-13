@@ -166,7 +166,11 @@ static bool kelvin_measure(uint8_t element, res_sample_t *out)
     out->v_n_mv = vn;
     out->v_b_mv = vb;
     out->v_tia_mv = -1.0;
-    out->current_ua = rmode_current_ua(rref, vb);
+
+    /* SH carries the C-mode 10M/1M divider in every mode.  Its current does
+     * not pass through the DUT, so remove it before reporting current/R. */
+    double i_dut_ua = rmode_current_ua_div(rref, vn, vb, RMODE_SH_DIV_OHM);
+    out->current_ua = (i_dut_ua > 0.0) ? i_dut_ua : 0.0;
 
     /* 2.3 V is the Kelvin operating limit, not the ADC limit: above it the
      * current source is out of compliance and the TIA is the right path. */
@@ -179,7 +183,7 @@ static bool kelvin_measure(uint8_t element, res_sample_t *out)
         return false;
     }
 
-    double r = rmode_resistance(rref, vn, vb);
+    double r = rmode_resistance_div(rref, vn, vb, RMODE_SH_DIV_OHM);
     if (r < 0.0) {
         out->saturated = true;
         return false;
