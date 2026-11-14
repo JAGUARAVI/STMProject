@@ -1,18 +1,34 @@
-# ESWCap Rev C hardware
+# ESWCap Rev C.1 hardware
 
-This directory contains the KiCad source for the Rev C carrier:
-USB-only power, 3.3 V relays, true 4-wire C/R, and the corrected J8 bias
-header.
+This directory contains the KiCad source for the Rev C carrier with the
+accuracy-plan changes applied (**Rev C.1**, see `docs/accuracy-plan.md`):
+USB-only power, 3.3 V relays, true 4-wire C/R, the corrected J8 bias header,
+and the H1–H6 accuracy changes.
 
-## Status
+## Status (2026-11-13)
 
-- **Schematic:** implemented and ERC-clean (0 errors, 0 warnings).
-- **PCB:** intentionally not part of this push. The routed
-  `wip/Project-revC-routing-baseline.kicad_pcb` is an **intermediate
-  pre-review baseline** and does not match the current schematic. Do not send
-  it to fabrication. It is kept only to preserve routing work.
-- **BOM:** generated from the schematic; `fab/Project-bom.csv`.
-- **Schematic PDF/SVG:** `fab/Project-schematic.pdf` and `.svg`.
+- **Schematic:** Rev C + accuracy plan H1–H6. ERC-clean (0 errors, 0 warnings).
+  - H1 J2-13 (PA7, OPAMP1 sense) moved FL → `MUXR_COM`
+  - H2 `MUXR_EN` moved J2-17 (PB2) → J1-17 (PB15)
+  - H3 `VBUF` also on J2-17 (PB2, OPAMP3 VINM0) for the PGA stage
+  - H4 R20 100k → 1k; H5 D1 BAT54S → BAV199; H6 R33 1M → 10M
+  - PWR_FLAGs excluded from BOM/board
+- **PCB:** `kicad/Project.kicad_pcb`, 111 × 85 mm, 2 layers, **fully routed**.
+  DRC: 0 unconnected, 0 clearance/short/hole errors, schematic parity clean;
+  45 silkscreen-only warnings. Critical analog nets are hand-routed and locked;
+  the rest is Freerouting + targeted fixes. How it was built:
+  `scripts/README.md`.
+  - Ground: B.Cu plane + F.Cu pour, stitched by ~318 vias, with **no-pour
+    cutouts** under J5/SH divider/U9/U10, the VCAP node, and the TIA input (P2)
+  - TIA guard: F.Cu `VBIAS` pour around the U1A summing node (P1)
+  - Footprint fixes: C1 and J5/J6 courtyards/silkscreen now match the real
+    bodies (they were drawn around the pads only)
+- **Fab outputs:** `fab/Project-gerbers.zip` (`fab/gerbers/`), drill + map,
+  `fab/Project-pos.csv`, `fab/Project-bom.csv`, schematic PDF/SVG,
+  `fab/Project-pcb-front.pdf` / `-back.pdf`, `fab/Project-3d-top.png`.
+  **Not yet reviewed by a person — review before ordering.**
+- `wip/Project-revC-routing-baseline.kicad_pcb` is the old pre-review baseline,
+  kept for reference only. Do not fabricate it.
 
 Open `kicad/Project.kicad_pro` with KiCad 10. The project-local libraries
 (`eswcap.kicad_sym`, `eswcap.pretty/`) are included; the schematic will not

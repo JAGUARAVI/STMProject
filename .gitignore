@@ -41,3 +41,9 @@ Thumbs.db
 *~
 # Host unit-test binary
 test/host/esc_test
+
+# KiCad per-user view/session settings
+*.kicad_prl
+fp-info-cache
+*-backups/
+~*.lck

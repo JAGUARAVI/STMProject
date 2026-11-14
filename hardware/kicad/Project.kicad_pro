@@ -547,47 +547,115 @@
     "netclass_patterns": [
       {
         "netclass": "Power",
-        "pattern": "+3V3"
+        "pattern": "/+3V3"
       },
       {
         "netclass": "Power",
-        "pattern": "+5V"
+        "pattern": "/GND"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/V_BIAS"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/SSR1_SW"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/SSR2_SW"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/SSR3_SW"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/K1_C"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/K2_C"
       },
       {
         "netclass": "Analog",
-        "pattern": "B"
+        "pattern": "/FH"
       },
       {
         "netclass": "Analog",
-        "pattern": "N_DUT"
+        "pattern": "/FL"
       },
       {
         "netclass": "Analog",
-        "pattern": "VCAP"
+        "pattern": "/SH"
       },
       {
         "netclass": "Analog",
-        "pattern": "C_BLOCK"
+        "pattern": "/SL"
       },
       {
         "netclass": "Analog",
-        "pattern": "TIA_OUT"
+        "pattern": "/SL_BUF"
       },
       {
         "netclass": "Analog",
-        "pattern": "RF_TOP"
+        "pattern": "/SH_DIV"
       },
       {
         "netclass": "Analog",
-        "pattern": "VN_SENSE"
+        "pattern": "/VN_IN"
       },
       {
         "netclass": "Analog",
-        "pattern": "VBIAS"
+        "pattern": "/VN_SENSE"
       },
       {
         "netclass": "Analog",
-        "pattern": "VREF"
+        "pattern": "/VCAP"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/VCAP_ADC"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/C_BLOCK"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/TIA_OUT"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/RF_TOP"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/VBIAS"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/VREF"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/MUXR_COM"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/VBUF"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/Q1_D"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/Q1_GATE"
+      },
+      {
+        "netclass": "Analog",
+        "pattern": "/OP1_OUT"
       }
     ]
   },

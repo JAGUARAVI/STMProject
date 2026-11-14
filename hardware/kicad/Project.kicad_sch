@@ -4,6 +4,12 @@
 	(generator_version "10.0")
 	(uuid "05eec81c-f433-4615-aab8-a7fd0594e457")
 	(paper "A3")
+	(title_block
+		(title "ESWCap C+R Meter — carrier board")
+		(date "2026-11-14")
+		(rev "C.1")
+		(company "Team Praise Claude — Embedded Systems Workshop")
+	)
 	(lib_symbols
 		(symbol "eswcap:Conn_01x20"
 			(pin_names
@@ -956,8 +962,8 @@
 				(hide yes)
 			)
 			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
+			(in_bom no)
+			(on_board no)
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "FLG"
@@ -3148,9 +3154,22 @@
 		(at 35.56 162.56)
 		(uuid "e734e012-ea09-489f-8599-981da550d3fb")
 	)
-	(no_connect
-		(at 35.56 165.1)
-		(uuid "c3d5876d-7e90-4566-86f0-0741f56f217a")
+	(wire
+		(pts
+			(xy 35.56 165.1)
+			(xy 38.1 165.1)
+		)
+		(uuid "b2b9aa1a-18ea-48ef-9e50-cccfd20f8d38")
+	)
+	(label "MUXR_EN"
+		(at 38.1 165.1 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f1f6cec9-a4be-407e-b7f4-25cfc0c9b05f")
 	)
 	(no_connect
 		(at 35.56 43.18)
@@ -6350,7 +6369,7 @@
 		)
 		(uuid "6220efab-d695-4358-be49-2c653e3c7139")
 	)
-	(label "MUXR_EN"
+	(label "VBUF"
 		(at 38.1 78.74 0)
 		(effects
 			(font
@@ -7290,7 +7309,7 @@
 		)
 		(uuid "5a1ece71-e7ac-44dd-b5ea-eb716734401d")
 	)
-	(label "FL"
+	(label "MUXR_COM"
 		(at 38.1 68.58 0)
 		(effects
 			(font
@@ -8809,8 +8828,8 @@
 		(lib_id "eswcap:PWR_FLAG")
 		(at 397.51 105.41 0)
 		(unit 1)
-		(in_bom yes)
-		(on_board yes)
+		(in_bom no)
+		(on_board no)
 		(dnp no)
 		(uuid "12e5a254-97a0-4660-9a46-65f4e6d12484")
 		(property "Reference" "FLG1"
@@ -8870,8 +8889,8 @@
 		(lib_id "eswcap:PWR_FLAG")
 		(at 397.51 129.54 0)
 		(unit 1)
-		(in_bom yes)
-		(on_board yes)
+		(in_bom no)
+		(on_board no)
 		(dnp no)
 		(uuid "6ddb395c-3b65-4ad4-b540-6d1441cf1a94")
 		(property "Reference" "FLG3"
@@ -8931,8 +8950,8 @@
 		(lib_id "eswcap:PWR_FLAG")
 		(at 397.51 140.97 0)
 		(unit 1)
-		(in_bom yes)
-		(on_board yes)
+		(in_bom no)
+		(on_board no)
 		(dnp no)
 		(uuid "abb8877e-aa9e-4756-9428-1afeb498ac06")
 		(property "Reference" "FLG4"
@@ -9529,7 +9548,7 @@
 				)
 			)
 		)
-		(property "Value" "BAT54S"
+		(property "Value" "BAV199"
 			(at 271.78 68.58 0)
 			(effects
 				(font
@@ -10456,7 +10475,7 @@
 				)
 			)
 		)
-		(property "Value" "100k"
+		(property "Value" "1k"
 			(at 191.77 184.15 0)
 			(effects
 				(font
@@ -12559,7 +12578,7 @@
 				)
 			)
 		)
-		(property "Value" "1M"
+		(property "Value" "10M 0.1%"
 			(at 40.64 283.21 0)
 			(effects
 				(font
