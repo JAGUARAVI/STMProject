@@ -15,6 +15,8 @@ PALETTE = ['#1d4ed8', '#059669', '#d97706', '#7c3aed', '#db2777', '#0891b2', '#6
 def wire_color(net):
     if net == '+3V3':
         return '#dc2626'
+    if net == '+5V':
+        return '#f97316'
     if net == 'GND':
         return '#111827'
     return PALETTE[sum(ord(c) * (i + 3) for i, c in enumerate(net)) % len(PALETTE)]
@@ -181,18 +183,21 @@ def draw_board(g, L, b, ox, oy, detail=True):
             xs, ys = X(hl[0]), [Y(h) for h in hl]
             fill = {'sip': '#15803d', 'to92': '#111827', 'hdr': '#111827'}[k]
             if k == 'to92':
-                g.add(f'<path d="M {(xs - 0.45) * S:.1f} {(min(ys) - 0.5) * S:.1f} L {(xs - 0.45) * S:.1f} {(max(ys) + 0.5) * S:.1f} '
-                      f'Q {(xs + 1.9) * S:.1f} {((min(ys) + max(ys)) / 2) * S:.1f} {(xs - 0.45) * S:.1f} {(min(ys) - 0.5) * S:.1f} Z" '
+                fx, qx = (xs - 0.45, xs + 1.9) if P.get('face', 'a') == 'a' else (xs + 0.45, xs - 1.9)   # flat face side
+                g.add(f'<path d="M {fx * S:.1f} {(min(ys) - 0.5) * S:.1f} L {fx * S:.1f} {(max(ys) + 0.5) * S:.1f} '
+                      f'Q {qx * S:.1f} {((min(ys) + max(ys)) / 2) * S:.1f} {fx * S:.1f} {(min(ys) - 0.5) * S:.1f} Z" '
                       f'fill="{fill}" stroke="#000" opacity="0.9"/>')
             else:
                 g.rect(xs - 0.47, min(ys) - 0.47, 0.94, max(ys) - min(ys) + 0.94, fill, '#000', 0.04, 0.12)
-            names = {'3': 'C', '1': 'B', '2': 'E'} if k == 'to92' else None
+            names = P.get('names') or ({'3': 'C', '1': 'B', '2': 'E'} if k == 'to92' else None)
             for p, h in pins.items():
                 if detail:
                     g.text(X(h), Y(h), names[p] if names else p, 0.46, '#fff', bold=True)
             if detail:
                 side = P.get('lab', 'r')
-                dx = {'r': 0.65, 'l': -0.65}[side] + (0.5 if k == 'to92' and side == 'r' else 0)
+                dx = {'r': 0.65, 'l': -0.65}[side] + (0.5 if k == 'to92' and side == 'r' and P.get('face', 'a') == 'a' else 0)
+                if k == 'to92' and P.get('face') == 'j':
+                    dx = -1.15
                 g.text(xs + dx, (min(ys) + max(ys)) / 2, ref, 0.52, '#111', rot=-90, bold=True, halo=True)
         elif k == 'term':
             xs, ys = X(hl[0]), [Y(h) for h in hl]

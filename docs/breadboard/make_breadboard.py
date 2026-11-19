@@ -16,12 +16,14 @@ import tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bb_engine import *          # noqa
 import bb_layout                 # noqa
+import bb_variant                # noqa
 from bb_draw import *            # noqa
 import bb_draw                   # noqa
 
 NETLIST, OUT = sys.argv[1], sys.argv[2]
 NB = 5
 value, pinnet, pinfn = parse_netlist(NETLIST)
+bb_variant.apply(value, pinnet, pinfn)          # parts actually fitted (see bb_variant.py)
 L = Layout(NB, value, pinnet, pinfn)
 bb_layout.place(L)
 if not L.route():
@@ -196,7 +198,7 @@ def board_page(b):
         if nd[0] != b or len(nd) == 2:
             continue
         nc = net.startswith('unconnected')
-        col = '#9ca3af' if nc else '#b91c1c' if net == '+3V3' else '#374151' if net == 'GND' else '#1e3a8a'
+        col = '#9ca3af' if nc else '#b91c1c' if net == '+3V3' else '#c2410c' if net == '+5V' else '#374151' if net == 'GND' else '#1e3a8a'
         name = 'no connection: keep empty' if nc else net
         extra = '   '.join(f'[{t}]' for t in notes.get(nd, []))
         if nd[1] == 'L':
